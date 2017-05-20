@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<h1>5 Card Poker</h1>
+<script type='text/javascript' src='https://cdnjs.cloudfare.com/ajax/libs/socket.io/1.7.3/socket.io.js'></script>
+<script src="poker.js"></script>
+<script src="server.js"></script> 
+</head>
+<body>
+<input type="text" id="player"><br />
+<input type="button" id="ready" value="Ready">
+<input type="button" id="deal" value="Deal cards">
+<input type="button" id="replace" value="Replace cards">
+<p id="cards"> </p><p id="pack"></p>
+<script type="text/javascript">
+	var myCards = document.getElementById('cards');
+	var ready = false;
+		$("#deal").attr("disabled", "disabled");
+		var socket = io.connect("http://localhost:3000");
+		$("#ready").click(function() {
+			var player = $("#player").val();
+			console.log(player);
+			console.log('called');
+			socket.emit("addPlayer", player);
+			ready = true;
+			$("#deal").removeAttr("disabled");
+			$("#ready").attr("disabled", "disabled");
+			$("#player").remove();
+		});
+		$("#deal").click(function() {
+			if(ready) {
+				console.log("dealing cards");
+				socket.emit("dealCards");
+				socket.emit("getOpponents");
+			}
+		});
+		socket.on("showCards", function(cards){
+			if(ready) {
+				$("#cards").text(cards);
+			}
+		});
+</script>
+<script type="text/javascript">
+var poker = new Poker();
+poker.DeckInit();
+</script>
+<table>
+<tr>
+	<td colspan="2">
+	<script type="text/javascript">
+		poker.buttons.draw();
+	</script>
+	</td>
+</tr>
+</table>
+</body>
+</html>
